@@ -1,0 +1,24 @@
+{
+  "name": "PipelineStage",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "position": {
+      "type": "number",
+      "default": 0
+    },
+    "color": {
+      "type": "string",
+      "default": "#7c3aed"
+    }
+  },
+  "required": [
+    "name",
+    "project_id"
+  ]
+}

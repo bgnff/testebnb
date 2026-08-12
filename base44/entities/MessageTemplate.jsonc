@@ -1,0 +1,30 @@
+{
+  "name": "MessageTemplate",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "cobranca",
+        "upgrade",
+        "reuniao",
+        "outro"
+      ],
+      "default": "outro"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "body"
+  ]
+}

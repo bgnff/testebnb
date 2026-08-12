@@ -1,0 +1,66 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "starter",
+        "pro",
+        "enterprise",
+        "outro"
+      ],
+      "default": "free"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "active",
+        "churned"
+      ],
+      "default": "lead"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "meeting_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "meeting_time": {
+      "type": "string"
+    },
+    "meeting_topic": {
+      "type": "string"
+    },
+    "meeting_status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "done",
+        "cancelled"
+      ],
+      "default": "scheduled"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

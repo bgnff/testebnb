@@ -1,0 +1,57 @@
+{
+  "name": "PipelineCard",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "stage_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "stage_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "changed_by": {
+            "type": "string"
+          },
+          "changed_date": {
+            "type": "string"
+          }
+        }
+      },
+      "default": []
+    },
+    "position": {
+      "type": "number",
+      "default": 0
+    },
+    "value": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "name",
+    "stage_id",
+    "project_id"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "message"
+  ]
+}

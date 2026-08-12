@@ -1,0 +1,27 @@
+{
+  "name": "Column",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "board_id": {
+      "type": "string"
+    },
+    "position": {
+      "type": "number",
+      "default": 0
+    },
+    "wip_limit": {
+      "type": "number"
+    },
+    "wip_enabled": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "board_id"
+  ]
+}

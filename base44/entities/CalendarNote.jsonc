@@ -1,0 +1,25 @@
+{
+  "name": "CalendarNote",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "content": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "default": "#7c3aed"
+    }
+  },
+  "required": [
+    "date",
+    "content",
+    "project_id"
+  ]
+}
