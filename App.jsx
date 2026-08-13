@@ -16,7 +16,6 @@ import Board from '@/pages/Board';
 import Calendar from '@/pages/Calendar';
 import TaskList from '@/pages/TaskList';
 import Settings from '@/pages/Settings';
-import Downloads from '@/pages/Downloads';
 import Sales from '@/pages/Sales';
 import Layout from '@/Layout';
 
@@ -39,7 +38,6 @@ function App() {
                   <Route path="/calendar" element={<Calendar />} />
                   <Route path="/tasks" element={<TaskList />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="/downloads" element={<Downloads />} />
                   <Route path="/sales" element={<Sales />} />
                 </Route>
               </Route>

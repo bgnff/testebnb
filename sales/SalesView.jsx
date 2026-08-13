@@ -12,13 +12,17 @@ import TemplateManager from '@/sales/TemplateManager';
 import SendMessageDialog from '@/sales/SendMessageDialog';
 
 export const STATUS = {
-  lead: { label: 'Lead', chip: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400', dot: 'bg-amber-500' },
-  active: { label: 'Ativo', chip: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400', dot: 'bg-emerald-500' },
-  churned: { label: 'Churn', chip: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400', dot: 'bg-rose-500' },
+  manutencao_recorrente: { label: 'Manutenção Recorrente', chip: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400', dot: 'bg-blue-500' },
+  cliente_ativo: { label: 'Cliente Ativo', chip: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400', dot: 'bg-emerald-500' },
+  pendente: { label: 'Pendente', chip: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400', dot: 'bg-amber-500' },
+  inativo: { label: 'Inativo', chip: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400', dot: 'bg-rose-500' },
 };
 
 export const PLAN_LABELS = {
-  free: 'Free', starter: 'Starter', pro: 'Pro', enterprise: 'Enterprise', outro: 'Outro',
+  personalizado: 'Personalizado',
+  essencial: 'Essencial',
+  growth: 'Growth',
+  dominancia: 'Dominância',
 };
 
 export default function SalesView() {
@@ -88,9 +92,10 @@ export default function SalesView() {
 
   const counts = {
     all: clients.length,
-    lead: clients.filter((c) => c.status === 'lead').length,
-    active: clients.filter((c) => c.status === 'active').length,
-    churned: clients.filter((c) => c.status === 'churned').length,
+    manutencao_recorrente: clients.filter((c) => c.status === 'manutencao_recorrente').length,
+    cliente_ativo: clients.filter((c) => c.status === 'cliente_ativo').length,
+    pendente: clients.filter((c) => c.status === 'pendente').length,
+    inativo: clients.filter((c) => c.status === 'inativo').length,
   };
 
   return (
@@ -116,7 +121,7 @@ export default function SalesView() {
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome, empresa ou e-mail..." className="pl-9" />
         </div>
         <div className="flex items-center rounded-lg border border-border p-0.5">
-          {['all', 'lead', 'active', 'churned'].map((s) => (
+          {['all', 'manutencao_recorrente', 'cliente_ativo', 'pendente', 'inativo'].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}

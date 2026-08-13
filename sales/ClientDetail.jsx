@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog';
 import { Button } from '@/ui/button';
 import { Textarea } from '@/ui/textarea';
 import { clientsApi } from '@/lib/api/clients';
-import { Mail, MessageCircle, CalendarClock, Building2, Phone, Pencil, Trash2, Save, X } from 'lucide-react';
+import { Mail, MessageCircle, CalendarClock, Building2, Pencil, Trash2, Save, X, DollarSign } from 'lucide-react';
 import { format, parseISO, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { STATUS, PLAN_LABELS } from '@/sales/SalesView';
@@ -29,6 +29,11 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
     meeting_topic: client.meeting_topic || '',
     meeting_status: client.meeting_status || 'scheduled',
   });
+  const [editingPayment, setEditingPayment] = useState(false);
+  const [payment, setPayment] = useState({
+    monthly_value: client.monthly_value || '',
+    next_payment_date: client.next_payment_date || '',
+  });
   const [sendOpen, setSendOpen] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -41,6 +46,17 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
       const updated = await clientsApi.update(client.id, meeting);
       onUpdate(updated);
       setEditingMeeting(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const savePayment = async () => {
+    setSaving(true);
+    try {
+      const updated = await clientsApi.update(client.id, payment);
+      onUpdate(updated);
+      setEditingPayment(false);
     } finally {
       setSaving(false);
     }
@@ -70,7 +86,6 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
           <div className="bg-muted/40 rounded-xl p-3 divide-y divide-border/60">
             <Field icon={Building2} label="Empresa" value={client.company} />
             <Field icon={Mail} label="E-mail" value={client.email} />
-            <Field icon={Phone} label="Telefone" value={client.phone} />
             <Field icon={MessageCircle} label="WhatsApp" value={client.whatsapp} />
           </div>
 
@@ -82,6 +97,50 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
             <Button size="sm" className="bg-[#25D366] hover:bg-[#1ebe57] text-white" disabled={!client.whatsapp} onClick={() => setSendOpen('whatsapp')}>
               <MessageCircle className="w-4 h-4 mr-1.5" /> WhatsApp
             </Button>
+          </div>
+
+          {/* Payment section */}
+          <div className="rounded-xl border border-border p-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-primary" /> Pagamento Mensal</h3>
+              <div className="flex items-center gap-1">
+                {!editingPayment ? (
+                  <Button variant="ghost" size="sm" onClick={() => setEditingPayment(true)}><Pencil className="w-3.5 h-3.5 mr-1" /> Editar</Button>
+                ) : (
+                  <Button variant="ghost" size="sm" onClick={() => setEditingPayment(false)}><X className="w-3.5 h-3.5" /></Button>
+                )}
+              </div>
+            </div>
+
+            {!editingPayment ? (
+              client.monthly_value ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">R$ {Number(client.monthly_value).toFixed(2)}</p>
+                    {client.next_payment_date && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+                  </div>
+                  {client.next_payment_date && (
+                    <p className="text-sm text-muted-foreground">📅 Próximo pagamento: {format(parseISO(client.next_payment_date), "dd/MM/yyyy", { locale: ptBR })}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground/70 py-1">Nenhum valor mensal definido. Clique em editar para configurar.</p>
+              )
+            ) : (
+              <div className="space-y-2.5">
+                <div>
+                  <label className="text-xs text-muted-foreground">Valor Mensal (R$)</label>
+                  <input type="number" value={payment.monthly_value} onChange={(e) => setPayment({ ...payment, monthly_value: e.target.value })} placeholder="0.00" className="w-full px-2.5 py-1.5 rounded-lg bg-background border border-border text-sm outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Próximo Pagamento</label>
+                  <input type="date" value={payment.next_payment_date} onChange={(e) => setPayment({ ...payment, next_payment_date: e.target.value })} className="w-full px-2.5 py-1.5 rounded-lg bg-background border border-border text-sm outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <Button size="sm" className="w-full" onClick={savePayment} disabled={saving}>
+                  <Save className="w-3.5 h-3.5 mr-1.5" /> Salvar pagamento
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Meeting section */}

@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 
 const EMPTY = {
-  name: '', company: '', email: '', phone: '', whatsapp: '',
-  plan: 'free', status: 'lead', notes: '',
+  name: '', company: '', email: '', whatsapp: '',
+  plan: 'personalizado', status: 'pendente', notes: '',
   meeting_date: '', meeting_time: '', meeting_topic: '', meeting_status: 'scheduled',
+  monthly_value: '', next_payment_date: '',
 };
 
 export default function ClientForm({ open, client, onClose, onSave }) {
@@ -55,10 +56,6 @@ export default function ClientForm({ open, client, onClose, onSave }) {
               <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="cliente@email.com" />
             </div>
             <div className="space-y-1.5">
-              <Label>Telefone</Label>
-              <Input value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="(11) 99999-9999" />
-            </div>
-            <div className="space-y-1.5">
               <Label>WhatsApp</Label>
               <Input value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} placeholder="5511999999999" />
             </div>
@@ -67,11 +64,10 @@ export default function ClientForm({ open, client, onClose, onSave }) {
               <Select value={form.plan} onValueChange={(v) => set('plan', v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="starter">Starter</SelectItem>
-                  <SelectItem value="pro">Pro</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
+                  <SelectItem value="personalizado">Personalizado</SelectItem>
+                  <SelectItem value="essencial">Essencial</SelectItem>
+                  <SelectItem value="growth">Growth</SelectItem>
+                  <SelectItem value="dominancia">Dominância</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -80,16 +76,31 @@ export default function ClientForm({ open, client, onClose, onSave }) {
               <Select value={form.status} onValueChange={(v) => set('status', v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="lead">Lead</SelectItem>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="churned">Churn</SelectItem>
+                  <SelectItem value="manutencao_recorrente">Manutenção Recorrente</SelectItem>
+                  <SelectItem value="cliente_ativo">Cliente Ativo</SelectItem>
+                  <SelectItem value="pendente">Pendente</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="pt-2 border-t border-border">
-            <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">📅 Reunião</p>
+            <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">� Pagamento Mensal</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Valor Mensal (R$)</Label>
+                <Input type="number" value={form.monthly_value || ''} onChange={(e) => set('monthly_value', e.target.value)} placeholder="0,00" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Próximo Pagamento</Label>
+                <Input type="date" value={form.next_payment_date || ''} onChange={(e) => set('next_payment_date', e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border">
+            <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">�📅 Reunião</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Data</Label>

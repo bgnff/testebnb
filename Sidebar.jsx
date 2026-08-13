@@ -17,7 +17,6 @@ const NAV = [
   { to: '/calendar', label: 'Calendário', icon: CalendarDays },
   { to: '/tasks', label: 'Tarefas', icon: ListChecks },
   { to: '/sales', label: 'Vendas & Clientes', icon: Users },
-  { to: '/downloads', label: 'Downloads', icon: Download },
 ];
 
 const PROJECT_ICON_MAP = {
