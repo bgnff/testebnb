@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/ui/use-toast';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Loader2, Plus, Search, Users, MessageSquareText, Pencil, Trash2, Mail, MessageCircle, CalendarClock, Building2 } from 'lucide-react';
 import { format, parseISO, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { clientsApi } from '@/lib/api/clients';
+import { useRealtimeClients } from '@/lib/hooks/useRealtimeClients';
 import ClientForm from '@/sales/ClientForm';
 import ClientDetail from '@/sales/ClientDetail';
 import TemplateManager from '@/sales/TemplateManager';
@@ -26,8 +26,7 @@ export const PLAN_LABELS = {
 };
 
 export default function SalesView() {
-  const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { clients, loading, setClients } = useRealtimeClients();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [formOpen, setFormOpen] = useState(false);
@@ -36,20 +35,6 @@ export default function SalesView() {
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [send, setSend] = useState(null);
   const { toast } = useToast();
-
-  const loadClients = useCallback(async () => {
-    setLoading(true);
-    try {
-      const list = await clientsApi.list();
-      setClients(list);
-    } catch {
-      toast({ title: 'Erro ao carregar clientes', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadClients(); }, [loadClients]);
 
   const filtered = clients.filter((c) => {
     const q = search.toLowerCase();

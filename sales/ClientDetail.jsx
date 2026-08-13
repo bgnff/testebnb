@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog';
 import { Button } from '@/ui/button';
 import { Textarea } from '@/ui/textarea';
@@ -36,15 +36,21 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
   });
   const [sendOpen, setSendOpen] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [currentClient, setCurrentClient] = useState(client);
 
-  const st = STATUS[client.status] || STATUS.lead;
-  const upcoming = client.meeting_date && isAfter(parseISO(client.meeting_date), new Date(new Date().setHours(0, 0, 0, 0)));
+  useEffect(() => {
+    setCurrentClient(client);
+  }, [client]);
+
+  const st = STATUS[currentClient.status] || STATUS.pendente;
+  const upcoming = currentClient.meeting_date && isAfter(parseISO(currentClient.meeting_date), new Date(new Date().setHours(0, 0, 0, 0)));
 
   const saveMeeting = async () => {
     setSaving(true);
     try {
-      const updated = await clientsApi.update(client.id, meeting);
+      const updated = await clientsApi.update(currentClient.id, meeting);
       onUpdate(updated);
+      setCurrentClient(updated);
       setEditingMeeting(false);
     } finally {
       setSaving(false);
@@ -54,8 +60,9 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
   const savePayment = async () => {
     setSaving(true);
     try {
-      const updated = await clientsApi.update(client.id, payment);
+      const updated = await clientsApi.update(currentClient.id, payment);
       onUpdate(updated);
+      setCurrentClient(updated);
       setEditingPayment(false);
     } finally {
       setSaving(false);
@@ -69,13 +76,13 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-start gap-3 min-w-0">
               <span className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-semibold text-lg flex-shrink-0">
-                {client.name?.charAt(0).toUpperCase()}
+                {currentClient.name?.charAt(0).toUpperCase()}
               </span>
               <div className="min-w-0">
-                <DialogTitle className="truncate">{client.name}</DialogTitle>
+                <DialogTitle className="truncate">{currentClient.name}</DialogTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${st.chip}`}>{st.label}</span>
-                  <span className="text-xs text-muted-foreground">{PLAN_LABELS[client.plan] || client.plan}</span>
+                  <span className="text-xs text-muted-foreground">{PLAN_LABELS[currentClient.plan] || currentClient.plan}</span>
                 </div>
               </div>
             </div>
@@ -84,17 +91,17 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
 
         <div className="space-y-4">
           <div className="bg-muted/40 rounded-xl p-3 divide-y divide-border/60">
-            <Field icon={Building2} label="Empresa" value={client.company} />
-            <Field icon={Mail} label="E-mail" value={client.email} />
-            <Field icon={MessageCircle} label="WhatsApp" value={client.whatsapp} />
+            <Field icon={Building2} label="Empresa" value={currentClient.company} />
+            <Field icon={Mail} label="E-mail" value={currentClient.email} />
+            <Field icon={MessageCircle} label="WhatsApp" value={currentClient.whatsapp} />
           </div>
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" disabled={!client.email} onClick={() => setSendOpen('email')}>
+            <Button variant="outline" size="sm" disabled={!currentClient.email} onClick={() => setSendOpen('email')}>
               <Mail className="w-4 h-4 mr-1.5" /> Enviar e-mail
             </Button>
-            <Button size="sm" className="bg-[#25D366] hover:bg-[#1ebe57] text-white" disabled={!client.whatsapp} onClick={() => setSendOpen('whatsapp')}>
+            <Button size="sm" className="bg-[#25D366] hover:bg-[#1ebe57] text-white" disabled={!currentClient.whatsapp} onClick={() => setSendOpen('whatsapp')}>
               <MessageCircle className="w-4 h-4 mr-1.5" /> WhatsApp
             </Button>
           </div>
@@ -113,14 +120,14 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
             </div>
 
             {!editingPayment ? (
-              client.monthly_value ? (
+              currentClient.monthly_value ? (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">R$ {Number(client.monthly_value).toFixed(2)}</p>
-                    {client.next_payment_date && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+                    <p className="text-sm font-medium">R$ {Number(currentClient.monthly_value).toFixed(2)}</p>
+                    {currentClient.next_payment_date && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
                   </div>
-                  {client.next_payment_date && (
-                    <p className="text-sm text-muted-foreground">📅 Próximo pagamento: {format(parseISO(client.next_payment_date), "dd/MM/yyyy", { locale: ptBR })}</p>
+                  {currentClient.next_payment_date && (
+                    <p className="text-sm text-muted-foreground">📅 Próximo pagamento: {format(parseISO(currentClient.next_payment_date), "dd/MM/yyyy", { locale: ptBR })}</p>
                   )}
                 </div>
               ) : (
@@ -157,17 +164,17 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
             </div>
 
             {!editingMeeting ? (
-              client.meeting_date ? (
+              currentClient.meeting_date ? (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{format(parseISO(client.meeting_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
-                    {upcoming && client.meeting_status === 'scheduled' && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+                    <p className="text-sm font-medium">{format(parseISO(currentClient.meeting_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
+                    {upcoming && currentClient.meeting_status === 'scheduled' && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
                   </div>
-                  {client.meeting_time && <p className="text-sm text-muted-foreground">🕐 {client.meeting_time}</p>}
-                  {client.meeting_topic && <p className="text-sm text-muted-foreground">📋 {client.meeting_topic}</p>}
+                  {currentClient.meeting_time && <p className="text-sm text-muted-foreground">🕐 {currentClient.meeting_time}</p>}
+                  {currentClient.meeting_topic && <p className="text-sm text-muted-foreground">📋 {currentClient.meeting_topic}</p>}
                   <div className="pt-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${client.meeting_status === 'done' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400' : client.meeting_status === 'cancelled' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400' : 'bg-primary/10 text-primary'}`}>
-                      {client.meeting_status === 'done' ? 'Realizada' : client.meeting_status === 'cancelled' ? 'Cancelada' : 'Agendada'}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${currentClient.meeting_status === 'done' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400' : currentClient.meeting_status === 'cancelled' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400' : 'bg-primary/10 text-primary'}`}>
+                      {currentClient.meeting_status === 'done' ? 'Realizada' : currentClient.meeting_status === 'cancelled' ? 'Cancelada' : 'Agendada'}
                     </span>
                   </div>
                 </div>
@@ -204,23 +211,23 @@ export default function ClientDetail({ client, onClose, onUpdate, onDelete, onEd
             )}
           </div>
 
-          {client.notes && (
+          {currentClient.notes && (
             <div>
               <p className="text-sm font-semibold mb-1.5">Observações</p>
-              <Textarea value={client.notes} readOnly rows={3} className="bg-muted/40 resize-none" />
+              <Textarea value={currentClient.notes} readOnly rows={3} className="bg-muted/40 resize-none" />
             </div>
           )}
 
           <div className="flex items-center gap-2 pt-2 border-t border-border">
-            {onEdit && <Button variant="outline" size="sm" className="flex-1" onClick={() => onEdit(client)}><Pencil className="w-4 h-4 mr-1.5" /> Editar cliente</Button>}
-            <Button variant="outline" size="sm" className={`${onEdit ? '' : 'flex-1'} text-destructive hover:text-destructive`} onClick={() => onDelete(client.id)}><Trash2 className="w-4 h-4 mr-1.5" /> Remover</Button>
+            {onEdit && <Button variant="outline" size="sm" className="flex-1" onClick={() => onEdit(currentClient)}><Pencil className="w-4 h-4 mr-1.5" /> Editar cliente</Button>}
+            <Button variant="outline" size="sm" className={`${onEdit ? '' : 'flex-1'} text-destructive hover:text-destructive`} onClick={() => onDelete(currentClient.id)}><Trash2 className="w-4 h-4 mr-1.5" /> Remover</Button>
           </div>
         </div>
       </DialogContent>
 
       {sendOpen && (
         <SendMessageDialog
-          client={client}
+          client={currentClient}
           mode={sendOpen}
           onClose={() => setSendOpen(null)}
         />
