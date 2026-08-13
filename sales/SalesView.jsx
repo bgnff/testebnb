@@ -57,11 +57,11 @@ export default function SalesView() {
   const handleSave = async (data) => {
     try {
       if (editing) {
-        const updated = await base44.entities.Client.update(editing.id, data);
+        const updated = await clientsApi.update(editing.id, data);
         setClients((p) => p.map((c) => (c.id === updated.id ? updated : c)));
         toast({ title: 'Cliente atualizado' });
       } else {
-        const created = await base44.entities.Client.create(data);
+        const created = await clientsApi.create(data);
         setClients((p) => [created, ...p]);
         toast({ title: 'Cliente criado' });
       }
