@@ -62,17 +62,32 @@ export default function SendMessageDialog({ client, mode, onClose }) {
   }, [loading, selectedType]);
 
   const openEmail = () => {
+    if (!client.email) {
+      toast({ title: 'E-mail do cliente não informado', variant: 'destructive' });
+      return;
+    }
     const subj = encodeURIComponent(subject || 'Contato');
     const bdy = encodeURIComponent(body || '');
-    window.location.href = `mailto:${client.email}?subject=${subj}&body=${bdy}`;
+    const url = `mailto:${client.email}?subject=${subj}&body=${bdy}`;
+    console.log('Opening email:', url);
+    window.location.href = url;
     toast({ title: 'Abrindo seu app de e-mail...' });
   };
 
   const openWhatsApp = () => {
     let num = (client.whatsapp || '').replace(/\D/g, '');
-    if (!num) return;
+    if (!num || num.length < 10) {
+      toast({ title: 'Número de WhatsApp inválido', variant: 'destructive' });
+      return;
+    }
+    // Adiciona código do país Brasil se não tiver
+    if (num.length === 10 || num.length === 11) {
+      num = '55' + num;
+    }
     const msg = encodeURIComponent(body || '');
-    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+    const url = `https://wa.me/${num}?text=${msg}`;
+    console.log('Opening WhatsApp:', url);
+    window.open(url, '_blank');
     toast({ title: 'Abrindo WhatsApp...' });
   };
 

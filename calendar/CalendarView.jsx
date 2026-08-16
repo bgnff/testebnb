@@ -158,20 +158,20 @@ export default function CalendarView() {
           <p className="text-sm text-muted-foreground">{tasks.length} tarefas · {notes.length} notas · {meetings.length} reuniões</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg border border-border p-0.5">
+          <div className="flex items-center rounded-lg border border-border p-0.5 shadow-sm">
             {VIEWS.map((v) => (
               <button
                 key={v.key}
                 onClick={() => { setView(v.key); setSelectedDay(null); }}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${view === v.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${view === v.key ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
               >
                 {v.label}
               </button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={() => { setCursor(new Date()); setSelectedDay(null); }}>Hoje</Button>
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}><ChevronLeft className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => navigate(1)}><ChevronRight className="w-4 h-4" /></Button>
+          <Button variant="outline" size="sm" onClick={() => { setCursor(new Date()); setSelectedDay(null); }} className="shadow-sm hover:shadow-md transition-shadow">Hoje</Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="hover:bg-muted transition-colors"><ChevronLeft className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate(1)} className="hover:bg-muted transition-colors"><ChevronRight className="w-4 h-4" /></Button>
         </div>
       </div>
 
@@ -179,12 +179,12 @@ export default function CalendarView() {
         <div className="flex-1 overflow-auto scrollbar-thin p-4">
           <div className="max-w-3xl mx-auto">
             {dayMeetings.length > 0 && (
-              <div className="bg-primary/5 rounded-2xl border border-primary/20 p-4 mb-4">
+              <div className="bg-primary/5 rounded-2xl border border-primary/20 p-4 mb-4 shadow-sm hover:shadow-md transition-shadow">
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5 text-primary"><Users className="w-4 h-4" /> Reuniões de clientes ({dayMeetings.length})</h3>
                 <div className="space-y-1.5">
                   {dayMeetings.map((m) => (
-                    <button key={m.id} onClick={() => setSelectedClient(m)} className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg bg-card hover:bg-primary/10 transition-colors border border-primary/20">
-                      <span className="w-1 h-5 rounded-full bg-primary flex-shrink-0" />
+                    <button key={m.id} onClick={() => setSelectedClient(m)} className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg bg-card hover:bg-primary/10 transition-all duration-200 hover:shadow-sm border border-primary/20">
+                      <span className="w-1 h-5 rounded-full bg-primary flex-shrink-0 shadow-sm" />
                       <span className="text-sm font-medium truncate">{m.name}</span>
                       {m.meeting_time && <span className="text-xs text-muted-foreground">{m.meeting_time}</span>}
                       {m.company && <span className="text-xs text-muted-foreground truncate flex-1">· {m.company}</span>}
@@ -194,7 +194,7 @@ export default function CalendarView() {
               </div>
             )}
 
-            <div className="bg-card rounded-2xl border border-border p-4 mb-4">
+            <div className="bg-card rounded-2xl border border-border p-4 mb-4 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5"><CalendarClock className="w-4 h-4" /> Tarefas do dia</h3>
               {dayTasks.length === 0 ? (
                 <p className="text-sm text-muted-foreground/60 py-4 text-center">Sem tarefas para este dia.</p>
@@ -204,11 +204,11 @@ export default function CalendarView() {
                     const p = PRIORITIES[t.priority] || PRIORITIES.medium;
                     const lc = t.labels?.[0]?.color || p.color;
                     return (
-                      <button key={t.id} onClick={() => setSelectedTask(t)} className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg hover:bg-muted transition-colors">
-                        <span className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: lc }} />
+                      <button key={t.id} onClick={() => setSelectedTask(t)} className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg hover:bg-muted transition-all duration-200 hover:shadow-sm">
+                        <span className="w-1 h-5 rounded-full flex-shrink-0 shadow-sm" style={{ backgroundColor: lc }} />
                         <span className={`text-sm flex-1 ${t.completed ? 'line-through text-muted-foreground' : ''}`}>{t.title}</span>
                         {t.assignee && <span className="text-xs text-muted-foreground">{t.assignee}</span>}
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${p.chip}`}>{p.label}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${p.chip} shadow-sm`}>{p.label}</span>
                       </button>
                     );
                   })}
@@ -216,22 +216,22 @@ export default function CalendarView() {
               )}
             </div>
 
-            <div className="bg-card rounded-2xl border border-border p-4">
+            <div className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5"><StickyNote className="w-4 h-4" /> Notas</h3>
               <div className="space-y-2 mb-3">
                 {dayNotes.map((n) => (
-                  <div key={n.id} className="group flex gap-2 p-2.5 rounded-lg border-l-4 bg-muted/40" style={{ borderColor: n.color }}>
+                  <div key={n.id} className="group flex gap-2 p-2.5 rounded-lg border-l-4 bg-muted/40 shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: n.color }}>
                     <p className="text-sm flex-1 whitespace-pre-wrap">{n.content}</p>
-                    <button onClick={() => deleteNote(n.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => deleteNote(n.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
                 {dayNotes.length === 0 && <p className="text-sm text-muted-foreground/60 py-1">Sem notas para este dia.</p>}
               </div>
               <div className="flex items-center gap-2 pt-2 border-t border-border">
-                <Textarea value={dayNoteContent} onChange={(e) => setDayNoteContent(e.target.value)} placeholder="Adicione uma nota para este dia..." rows={2} className="flex-1" />
+                <Textarea value={dayNoteContent} onChange={(e) => setDayNoteContent(e.target.value)} placeholder="Adicione uma nota para este dia..." rows={2} className="flex-1 shadow-sm focus:shadow-md transition-shadow" />
                 <div className="flex flex-col items-center gap-1.5">
-                  <input type="color" value={dayNoteColor} onChange={(e) => setDayNoteColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border border-border" />
-                  <Button size="sm" onClick={handleDayNoteAdd} disabled={!dayNoteContent.trim()}><Plus className="w-4 h-4" /></Button>
+                  <input type="color" value={dayNoteColor} onChange={(e) => setDayNoteColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border border-border shadow-sm hover:shadow-md transition-shadow" />
+                  <Button size="sm" onClick={handleDayNoteAdd} disabled={!dayNoteContent.trim()} className="shadow-sm hover:shadow-md transition-shadow"><Plus className="w-4 h-4" /></Button>
                 </div>
               </div>
             </div>

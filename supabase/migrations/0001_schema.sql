@@ -17,6 +17,7 @@ create table projects (
   description text,
   color text default '#7c3aed',
   icon text default 'LayoutDashboard',
+  logo text,
   user_id uuid references auth.users(id) default auth.uid(),
   created_at timestamptz default now()
 );
