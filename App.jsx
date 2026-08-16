@@ -17,6 +17,7 @@ import Calendar from '@/pages/Calendar';
 import TaskList from '@/pages/TaskList';
 import Settings from '@/pages/Settings';
 import Sales from '@/pages/Sales';
+import Styleguide from '@/pages/Styleguide';
 import Layout from '@/Layout';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
                   <Route path="/tasks" element={<TaskList />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/sales" element={<Sales />} />
+                  <Route path="/styleguide" element={<Styleguide />} />
                 </Route>
               </Route>
               <Route path="*" element={<PageNotFound />} />

@@ -116,38 +116,38 @@ export default function TaskListView() {
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar..." className="pl-8 h-9 w-40" />
+              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar..." className="pl-8 h-9 w-40 shadow-sm focus:shadow-md transition-shadow" />
             </div>
             <Select value={groupBy} onValueChange={setGroupBy}>
-              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-36 shadow-sm hover:shadow-md transition-shadow"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="priority">Agrupar por prioridade</SelectItem>
                 <SelectItem value="status">Agrupar por status</SelectItem>
                 <SelectItem value="due">Agrupar por vencimento</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="h-9" onClick={() => exportToCSV('tarefas.csv', ['Título', 'Prioridade', 'Vencimento', 'Concluída', 'Responsável'], tasks.map((t) => [t.title, t.priority, t.due_date || '', t.completed ? 'Sim' : 'Não', t.assignee || '']))}>
+            <Button variant="outline" size="sm" className="h-9 shadow-sm hover:shadow-md transition-shadow" onClick={() => exportToCSV('tarefas.csv', ['Título', 'Prioridade', 'Vencimento', 'Concluída', 'Responsável'], tasks.map((t) => [t.title, t.priority, t.due_date || '', t.completed ? 'Sim' : 'Não', t.assignee || '']))}>
               <Download className="w-4 h-4 mr-1.5" /> CSV
             </Button>
           </div>
         </div>
 
         {selected.size > 0 && (
-          <div className="sticky top-0 z-10 mb-4 flex items-center gap-2 bg-primary text-primary-foreground rounded-xl px-4 py-2.5 shadow-lg">
+          <div className="sticky top-0 z-10 mb-4 flex items-center gap-2 bg-primary text-primary-foreground rounded-xl px-4 py-2.5 shadow-lg animate-fade-in">
             <span className="text-sm font-medium">{selected.size} selecionada(s)</span>
             <div className="flex-1" />
-            <Button size="sm" variant="secondary" className="h-8" onClick={bulkComplete}><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Concluir</Button>
+            <Button size="sm" variant="secondary" className="h-8 shadow-sm hover:shadow-md transition-shadow" onClick={bulkComplete}><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Concluir</Button>
             <Select onValueChange={bulkPriority}>
-              <SelectTrigger className="h-8 w-36 border-0 bg-secondary"><SelectValue placeholder="Definir prioridade" /></SelectTrigger>
+              <SelectTrigger className="h-8 w-36 border-0 bg-secondary shadow-sm hover:shadow-md transition-shadow"><SelectValue placeholder="Definir prioridade" /></SelectTrigger>
               <SelectContent>
                 {Object.entries(PRIORITIES).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Button size="sm" variant="secondary" className="h-8 bg-destructive/90 hover:bg-destructive text-white" onClick={bulkDelete}><Trash2 className="w-3.5 h-3.5 mr-1" /> Excluir</Button>
+            <Button size="sm" variant="secondary" className="h-8 bg-destructive/90 hover:bg-destructive text-white shadow-sm hover:shadow-md transition-shadow" onClick={bulkDelete}><Trash2 className="w-3.5 h-3.5 mr-1" /> Excluir</Button>
           </div>
         )}
 
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
           <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border bg-muted/40">
             <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
             <span className="text-xs font-medium text-muted-foreground flex-1">Tarefa</span>
@@ -161,9 +161,9 @@ export default function TaskListView() {
               {items.map((t) => {
                 const p = PRIORITIES[t.priority] || PRIORITIES.medium;
                 return (
-                  <div key={t.id} className={`flex items-center gap-3 px-4 py-2.5 border-b border-border last:border-0 hover:bg-muted/30 transition-colors ${selected.has(t.id) ? 'bg-primary/5' : ''}`}>
+                  <div key={t.id} className={`flex items-center gap-3 px-4 py-2.5 border-b border-border last:border-0 hover:bg-muted/30 transition-all duration-200 hover:shadow-sm ${selected.has(t.id) ? 'bg-primary/5' : ''}`}>
                     <Checkbox checked={selected.has(t.id)} onCheckedChange={() => toggle(t.id)} />
-                    <button onClick={() => toggleComplete(t)} className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0" style={{ borderColor: t.completed ? '#10b981' : undefined }}>
+                    <button onClick={() => toggleComplete(t)} className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200 hover:scale-110" style={{ borderColor: t.completed ? '#10b981' : undefined }}>
                       {t.completed && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                     </button>
                     <span className={`text-sm flex-1 truncate ${t.completed ? 'line-through text-muted-foreground' : ''}`}>{t.title}</span>
@@ -173,7 +173,7 @@ export default function TaskListView() {
                       </span>
                     )}
                     {!t.due_date && <span className="text-xs w-24 text-muted-foreground/50">—</span>}
-                    <span className={`text-xs w-20 inline-flex items-center gap-1 ${p.chip} px-2 py-0.5 rounded-full`}>
+                    <span className={`text-xs w-20 inline-flex items-center gap-1 ${p.chip} px-2 py-0.5 rounded-full shadow-sm`}>
                       <Flag className="w-2.5 h-2.5" />{p.label}
                     </span>
                   </div>

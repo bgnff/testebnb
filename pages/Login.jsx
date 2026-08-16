@@ -41,7 +41,7 @@ export default function Login() {
       }
     >
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm border border-destructive/20 shadow-sm animate-fade-in">
           {error}
         </div>
       )}
@@ -59,7 +59,7 @@ export default function Login() {
               placeholder="voce@exemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 h-12 shadow-sm focus:shadow-md transition-shadow"
               required
             />
           </div>
@@ -67,7 +67,7 @@ export default function Login() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Senha</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+            <Link to="/forgot-password" className="text-xs text-primary hover:underline transition-colors">
               Esqueceu a senha?
             </Link>
           </div>
@@ -80,12 +80,12 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 h-12 shadow-sm focus:shadow-md transition-shadow"
               required
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button type="submit" className="w-full h-12 font-medium shadow-sm hover:shadow-md transition-shadow" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

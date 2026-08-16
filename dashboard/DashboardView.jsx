@@ -49,10 +49,10 @@ export default function DashboardView() {
     .slice(0, 6);
 
   const stats = [
-    { label: 'Vence hoje', value: dueToday.length, icon: CalendarClock, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40' },
-    { label: 'Atrasadas', value: overdue.length, icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/40' },
-    { label: 'Concluídas', value: completed.length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40' },
-    { label: 'Total de tarefas', value: tasks.length, icon: ListTodo, color: 'text-primary', bg: 'bg-primary/10' },
+    { label: 'Vence hoje', value: dueToday.length, icon: CalendarClock, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200 dark:border-amber-900' },
+    { label: 'Atrasadas', value: overdue.length, icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/40', border: 'border-red-200 dark:border-red-900' },
+    { label: 'Concluídas', value: completed.length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200 dark:border-emerald-900' },
+    { label: 'Total de tarefas', value: tasks.length, icon: ListTodo, color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20' },
   ];
 
   return (
@@ -65,8 +65,8 @@ export default function DashboardView() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {stats.map((s) => (
-            <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
-              <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
+            <div key={s.label} className={`bg-card rounded-2xl border ${s.border} p-4 shadow-sm hover:shadow-md transition-all duration-200`}>
+              <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3 shadow-sm`}>
                 <s.icon className={`w-4 h-4 ${s.color}`} />
               </div>
               <p className="text-2xl font-semibold">{s.value}</p>
@@ -76,7 +76,7 @@ export default function DashboardView() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <div className="bg-card rounded-2xl border border-border p-5">
+          <div className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
             <h3 className="text-sm font-semibold mb-4">Tarefas por coluna</h3>
             {colData.length === 0 ? (
               <p className="text-sm text-muted-foreground/60 py-8 text-center">Sem dados</p>
@@ -93,7 +93,7 @@ export default function DashboardView() {
             )}
           </div>
 
-          <div className="bg-card rounded-2xl border border-border p-5">
+          <div className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
             <h3 className="text-sm font-semibold mb-4">Tarefas por prioridade</h3>
             {priorityData.length === 0 ? (
               <p className="text-sm text-muted-foreground/60 py-8 text-center">Sem dados</p>
@@ -117,10 +117,10 @@ export default function DashboardView() {
           </div>
         </div>
 
-        <div className="bg-card rounded-2xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Próximas tarefas</h3>
-            <button onClick={() => navigate('/board')} className="text-xs text-primary flex items-center gap-1 hover:underline">Ver quadro <ArrowRight className="w-3 h-3" /></button>
+            <button onClick={() => navigate('/board')} className="text-xs text-primary flex items-center gap-1 hover:underline transition-colors">Ver quadro <ArrowRight className="w-3 h-3" /></button>
           </div>
           {upcoming.length === 0 ? (
             <p className="text-sm text-muted-foreground/60 py-8 text-center">Nada agendado. Tudo em dia! 🎉</p>
@@ -129,8 +129,8 @@ export default function DashboardView() {
               {upcoming.map((t) => {
                 const p = PRIORITIES[t.priority] || PRIORITIES.medium;
                 return (
-                  <div key={t.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+                  <div key={t.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted/50 transition-all duration-200 hover:shadow-sm">
+                    <span className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
                     <span className="text-sm flex-1 truncate">{t.title}</span>
                     <span className={`text-xs ${isOverdue(t.due_date) ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
                       {new Date(t.due_date + 'T00:00').toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })}
