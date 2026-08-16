@@ -18,8 +18,8 @@ export default function MobileTopBar({ onQuickAdd }) {
   return (
     <div className="md:hidden border-b border-border bg-background/90 backdrop-blur sticky top-0 z-30">
       <div className="flex items-center gap-2 px-4 py-2.5">
-        <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-sm">F</span>
-        <span className="font-semibold text-sm">FlowState</span>
+        <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-sm">B</span>
+        <span className="font-semibold text-sm">BnBWeb</span>
         <div className="flex-1" />
         <NotificationCenter className="h-9 w-9 flex items-center justify-center hover:bg-sidebar-accent transition-colors rounded-lg" iconSize="w-4 h-4" />
         <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-sidebar-accent transition-colors" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>

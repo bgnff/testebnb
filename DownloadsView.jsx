@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/ui/button';
 import { Database, FileText, Download, Loader2, Cloud, Rocket } from 'lucide-react';
 
-const SUPABASE_SCHEMA = `-- FlowState - Supabase Schema
+const SUPABASE_SCHEMA = `-- BnBWeb - Supabase Schema
 -- Use the migration files in supabase/migrations/ to apply this schema
 `;
 
-const README = `FlowState - Sistema de Produtividade
+const README = `BnBWeb - Sistema de Produtividade
 
 Módulos:
 - Kanban (Board/Column/Task)

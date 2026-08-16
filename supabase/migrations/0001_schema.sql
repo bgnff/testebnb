@@ -1,4 +1,4 @@
--- Fase 1 - Schema do banco de dados FlowState
+-- Fase 1 - Schema do banco de dados BnBWeb
 -- Copiar e colar no SQL Editor do Supabase em três blocos separados
 
 -- ============================================
