@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { tasksApi } from '@/lib/api/tasks';
 import { columnsApi } from '@/lib/api/columns';
 import { useProject } from '@/lib/project-context';
+import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import { useToast } from '@/ui/use-toast';
 import { PRIORITIES, PRIORITY_ORDER, isOverdue } from '@/lib/kanban-utils';
 import { Checkbox } from '@/ui/checkbox';
@@ -14,7 +15,7 @@ import { exportToCSV } from '@/lib/csv-export';
 export default function TaskListView() {
   const { currentProject } = useProject();
   const { toast } = useToast();
-  const [tasks, setTasks] = useState([]);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(new Set());
@@ -25,17 +26,13 @@ export default function TaskListView() {
     if (!currentProject) return;
     setLoading(true);
     try {
-      const [t, c] = await Promise.all([
-        tasksApi.getByProject(currentProject.id),
-        columnsApi.list(),
-      ]);
-      setTasks(t);
-      const boardIds = [...new Set(t.map((x) => x.board_id))];
+      const c = await columnsApi.list();
+      const boardIds = [...new Set(tasks.map((x) => x.board_id))];
       setColumns(c.filter((col) => boardIds.includes(col.board_id)));
     } finally {
       setLoading(false);
     }
-  }, [currentProject]);
+  }, [currentProject, tasks]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -70,31 +67,53 @@ export default function TaskListView() {
 
   const bulkComplete = async () => {
     const ids = [...selected];
-    await base44.entities.Task.bulkUpdate(ids.map((id) => ({ id, completed: true })));
-    setTasks((prev) => prev.map((t) => (selected.has(t.id) ? { ...t, completed: true } : t)));
-    setSelected(new Set());
-    toast({ title: `${ids.length} tarefa(s) concluída(s)` });
+    try {
+      for (const id of ids) {
+        await tasksApi.update(id, { completed: true });
+      }
+      // O hook de realtime vai atualizar automaticamente
+      setSelected(new Set());
+      toast({ title: `${ids.length} tarefa(s) concluída(s)` });
+    } catch (error) {
+      toast({ title: 'Erro ao concluir tarefas', description: error.message, variant: 'destructive' });
+    }
   };
 
   const bulkPriority = async (priority) => {
     const ids = [...selected];
-    await base44.entities.Task.bulkUpdate(ids.map((id) => ({ id, priority })));
-    setTasks((prev) => prev.map((t) => (selected.has(t.id) ? { ...t, priority } : t)));
-    setSelected(new Set());
-    toast({ title: `Prioridade atualizada para ${ids.length} tarefa(s)` });
+    try {
+      for (const id of ids) {
+        await tasksApi.update(id, { priority });
+      }
+      // O hook de realtime vai atualizar automaticamente
+      setSelected(new Set());
+      toast({ title: `Prioridade atualizada para ${ids.length} tarefa(s)` });
+    } catch (error) {
+      toast({ title: 'Erro ao atualizar prioridade', description: error.message, variant: 'destructive' });
+    }
   };
 
   const bulkDelete = async () => {
     if (!confirm(`Excluir ${selected.size} tarefa(s)?`)) return;
-    await base44.entities.Task.deleteMany({ id: { $in: [...selected] } });
-    setTasks((prev) => prev.filter((t) => !selected.has(t.id)));
-    setSelected(new Set());
-    toast({ title: 'Tarefas excluídas' });
+    try {
+      for (const id of [...selected]) {
+        await tasksApi.delete(id);
+      }
+      // O hook de realtime vai remover automaticamente
+      setSelected(new Set());
+      toast({ title: 'Tarefas excluídas' });
+    } catch (error) {
+      toast({ title: 'Erro ao excluir tarefas', description: error.message, variant: 'destructive' });
+    }
   };
 
   const toggleComplete = async (task) => {
-    await base44.entities.Task.update(task.id, { completed: !task.completed });
-    setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, completed: !t.completed } : t)));
+    try {
+      await tasksApi.update(task.id, { completed: !task.completed });
+      // O hook de realtime vai atualizar automaticamente
+    } catch (error) {
+      toast({ title: 'Erro ao atualizar tarefa', description: error.message, variant: 'destructive' });
+    }
   };
 
   const groupLabel = (key) => {

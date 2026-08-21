@@ -5,6 +5,8 @@ import { useToast } from '@/ui/use-toast';
 import { tasksApi } from '@/lib/api/tasks';
 import { calendarNotesApi } from '@/lib/api/calendar-notes';
 import { clientsApi } from '@/lib/api/clients';
+import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
+import { useRealtimeCalendarNotes } from '@/lib/hooks/useRealtimeCalendarNotes';
 import DayDetailDialog from '@/calendar/DayDetailDialog';
 import CalendarDayCell from '@/calendar/CalendarDayCell';
 import TaskDetailModal from '@/board/TaskDetailModal';
@@ -32,8 +34,8 @@ export default function CalendarView() {
   const { toast } = useToast();
   const [view, setView] = useState('month');
   const [cursor, setCursor] = useState(new Date());
-  const [tasks, setTasks] = useState([]);
-  const [notes, setNotes] = useState([]);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
+  const { notes, loading: notesLoading } = useRealtimeCalendarNotes(currentProject?.id);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -46,13 +48,7 @@ export default function CalendarView() {
     if (!currentProject) return;
     setLoading(true);
     try {
-      const [t, n, clients] = await Promise.all([
-        tasksApi.getByProject(currentProject.id),
-        calendarNotesApi.list(currentProject.id),
-        clientsApi.list(),
-      ]);
-      setTasks(t.filter((x) => x.due_date));
-      setNotes(n);
+      const clients = await clientsApi.list();
       setMeetings(clients.filter((c) => c.meeting_date && c.meeting_status === 'scheduled'));
     } finally {
       setLoading(false);
@@ -60,6 +56,8 @@ export default function CalendarView() {
   }, [currentProject]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const loadingCombined = tasksLoading || notesLoading || loading;
 
   const visibleDays = useMemo(() => {
     if (view === 'month') {
@@ -115,23 +113,22 @@ export default function CalendarView() {
     const newDate = destination.droppableId;
     const task = tasks.find((t) => t.id === draggableId);
     if (!task || task.due_date === newDate) return;
-    setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, due_date: newDate } : t)));
     try {
       await tasksApi.update(task.id, { due_date: newDate });
+      // O hook de realtime vai atualizar automaticamente
     } catch (e) {
       toast({ title: 'Falha ao reagendar', variant: 'destructive' });
-      loadData();
     }
   };
 
   const addNote = async (date, content, color) => {
-    const created = await calendarNotesApi.create({ date, content, color, project_id: currentProject.id });
-    setNotes((prev) => [...prev, created]);
+    await calendarNotesApi.create({ date, content, color, project_id: currentProject.id });
+    // O hook de realtime vai adicionar automaticamente
   };
 
   const deleteNote = async (id) => {
     await calendarNotesApi.delete(id);
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+    // O hook de realtime vai remover automaticamente
   };
 
   const handleDayNoteAdd = () => {
@@ -140,7 +137,7 @@ export default function CalendarView() {
     setDayNoteContent('');
   };
 
-  if (loading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
+  if (loadingCombined) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
 
   const dayDateStr = format(cursor, 'yyyy-MM-dd');
   const dayTasks = tasksByDate[dayDateStr] || [];

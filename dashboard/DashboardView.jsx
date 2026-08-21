@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { tasksApi } from '@/lib/api/tasks';
 import { columnsApi } from '@/lib/api/columns';
 import { useProject } from '@/lib/project-context';
+import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import { PRIORITIES, todayStr, isOverdue } from '@/lib/kanban-utils';
 import { Loader2, CalendarClock, AlertTriangle, CheckCircle2, ListTodo, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
@@ -10,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 export default function DashboardView() {
   const { currentProject } = useProject();
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,15 +19,13 @@ export default function DashboardView() {
     if (!currentProject) return;
     setLoading(true);
     try {
-      const t = await tasksApi.getByProject(currentProject.id);
-      setTasks(t);
       const cols = await columnsApi.list();
-      const boardIds = [...new Set(t.map((x) => x.board_id))];
+      const boardIds = [...new Set(tasks.map((x) => x.board_id))];
       setColumns(cols.filter((c) => boardIds.includes(c.board_id)));
     } finally {
       setLoading(false);
     }
-  }, [currentProject]);
+  }, [currentProject, tasks]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

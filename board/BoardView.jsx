@@ -5,6 +5,8 @@ import { ensureBoard, PRIORITIES } from '@/lib/kanban-utils';
 import { useToast } from '@/ui/use-toast';
 import { tasksApi } from '@/lib/api/tasks';
 import { columnsApi } from '@/lib/api/columns';
+import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
+import { useRealtimeColumns } from '@/lib/hooks/useRealtimeColumns';
 import BoardColumn from '@/board/BoardColumn';
 import TaskDetailModal from '@/board/TaskDetailModal';
 import { Input } from '@/ui/input';
@@ -16,9 +18,6 @@ export default function BoardView() {
   const { currentProject } = useProject();
   const { toast } = useToast();
   const [board, setBoard] = useState(null);
-  const [columns, setColumns] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState(null);
   const [search, setSearch] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -26,17 +25,18 @@ export default function BoardView() {
   const [addingColumn, setAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
 
+  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
+  const { columns, loading: columnsLoading } = useRealtimeColumns(board?.id);
+
+  const loading = tasksLoading || columnsLoading || !board;
+
   const loadData = useCallback(async () => {
     if (!currentProject) return;
-    setLoading(true);
     try {
-      const { board, columns } = await ensureBoard(currentProject.id);
-      setBoard(board);
-      setColumns(columns);
-      const t = await tasksApi.getByBoard(board.id);
-      setTasks(t);
-    } finally {
-      setLoading(false);
+      const { board: b } = await ensureBoard(currentProject.id);
+      setBoard(b);
+    } catch (error) {
+      console.error('Error loading board:', error);
     }
   }, [currentProject]);
 
@@ -117,19 +117,19 @@ export default function BoardView() {
     const created = await tasksApi.create({
       title, column_id: columnId, board_id: board.id, project_id: currentProject.id, position: colTasks.length,
     });
-    setTasks((prev) => [...prev, created]);
+    // O hook de realtime vai adicionar automaticamente
   };
 
   const addColumn = async () => {
     if (!newColumnName.trim()) return;
-    const created = await columnsApi.create({ name: newColumnName.trim(), board_id: board.id, position: columns.length });
-    setColumns((prev) => [...prev, created]);
+    await columnsApi.create({ name: newColumnName.trim(), board_id: board.id, position: columns.length });
     setNewColumnName(''); setAddingColumn(false);
+    // O hook de realtime vai adicionar automaticamente
   };
 
   const renameColumn = async (id, name) => {
     await columnsApi.update(id, { name });
-    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)));
+    // O hook de realtime vai atualizar automaticamente
   };
 
   const deleteColumn = async (id) => {
@@ -138,31 +138,30 @@ export default function BoardView() {
       await tasksApi.delete(t.id);
     }
     await columnsApi.delete(id);
-    setColumns((prev) => prev.filter((c) => c.id !== id));
-    setTasks((prev) => prev.filter((t) => t.column_id !== id));
+    // O hook de realtime vai remover automaticamente
   };
 
   const toggleWip = async (id) => {
     const col = columns.find((c) => c.id === id);
     const next = { wip_enabled: !col.wip_enabled, wip_limit: !col.wip_enabled ? (col.wip_limit || 3) : col.wip_limit };
     await columnsApi.update(id, next);
-    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, ...next } : c)));
+    // O hook de realtime vai atualizar automaticamente
   };
 
   const setWipLimit = async (id, value) => {
     await columnsApi.update(id, { wip_limit: value, wip_enabled: true });
-    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, wip_limit: value, wip_enabled: true } : c)));
+    // O hook de realtime vai atualizar automaticamente
   };
 
   const updateTask = (updated) => {
-    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+    // O hook de realtime vai atualizar automaticamente
     setSelectedTask(updated);
   };
 
   const deleteTask = async (id) => {
     await tasksApi.delete(id);
-    setTasks((prev) => prev.filter((t) => t.id !== id));
     setSelectedTask(null);
+    // O hook de realtime vai remover automaticamente
   };
 
   if (loading) {
