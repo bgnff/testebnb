@@ -22,7 +22,7 @@ export default function QuickAddTask({ open, onClose }) {
     if (!title.trim()) return;
     setSaving(true);
     try {
-      const { board, columns } = await ensureBoard('bnbweb-default');
+      const { board, columns } = await ensureBoard();
       const firstCol = columns[0];
       const colTasks = await tasksApi.list();
       await tasksApi.create({

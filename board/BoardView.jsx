@@ -30,8 +30,8 @@ export default function BoardView() {
 
   const loadData = useCallback(async () => {
     try {
-      // For single company, use a fixed board ID or get/create the first board
-      const { board: b } = await ensureBoard('bnbweb-default');
+      // For single company, get/create the first board
+      const { board: b } = await ensureBoard();
       setBoard(b);
     } catch (error) {
       console.error('Error loading board:', error);

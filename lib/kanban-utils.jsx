@@ -28,23 +28,23 @@ export function isToday(dateStr) {
   return dateStr === todayStr();
 }
 
-export async function ensureBoard(projectId) {
-  let boards = await boardsApi.list(projectId);
+export async function ensureBoard() {
+  let boards = await boardsApi.list();
   let board = boards[0];
   if (!board) {
-    board = await boardsApi.create({ name: 'Quadro Principal', project_id: projectId });
+    board = await boardsApi.create({ name: 'Quadro Principal' });
   }
-  let columns = await columnsApi.list(board.id);
+  let columns = await columnsApi.list();
   if (columns.length === 0) {
     const defaults = ['A Fazer', 'Em Andamento', 'Revisão', 'Concluído'];
     for (let i = 0; i < defaults.length; i++) {
       await columnsApi.create({ name: defaults[i], board_id: board.id, position: i });
     }
-    columns = await columnsApi.list(board.id);
+    columns = await columnsApi.list();
     // cria algumas tarefas de exemplo na primeira inicialização
-    await tasksApi.create({ title: 'Bem-vindo ao seu quadro 👋', description: 'Clique neste cartão para ver detalhes, adicionar subtarefas, comentários e mais.', column_id: columns[0].id, board_id: board.id, project_id: projectId, position: 0, priority: 'medium', labels: [{ name: 'Primeiros passos', color: '#7c3aed' }] });
-    await tasksApi.create({ title: 'Criar landing page', column_id: columns[1].id, board_id: board.id, project_id: projectId, position: 0, priority: 'high', due_date: todayStr() });
-    await tasksApi.create({ title: 'Definir metas do projeto', column_id: columns[0].id, board_id: board.id, project_id: projectId, position: 1, priority: 'low' });
+    await tasksApi.create({ title: 'Bem-vindo ao seu quadro 👋', description: 'Clique neste cartão para ver detalhes, adicionar subtarefas, comentários e mais.', column_id: columns[0].id, board_id: board.id, position: 0, priority: 'medium', labels: [{ name: 'Primeiros passos', color: '#7c3aed' }] });
+    await tasksApi.create({ title: 'Criar landing page', column_id: columns[1].id, board_id: board.id, position: 0, priority: 'high', due_date: todayStr() });
+    await tasksApi.create({ title: 'Definir metas do projeto', column_id: columns[0].id, board_id: board.id, position: 1, priority: 'low' });
   }
   columns.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   return { board, columns };
