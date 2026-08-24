@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProject } from '@/lib/project-context';
 import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import {
   Bell, AlertTriangle, CalendarClock, Clock, ChevronRight,
@@ -30,10 +29,9 @@ const SECTIONS = [
 ];
 
 export default function NotificationCenter({ className, iconSize = 'w-4 h-4' }) {
-  const { currentProject } = useProject();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const { tasks = [] } = useRealtimeTasks(currentProject?.id);
+  const { tasks = [] } = useRealtimeTasks();
   const ref = useRef(null);
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { tasksApi } from '@/lib/api/tasks';
 import { columnsApi } from '@/lib/api/columns';
-import { useProject } from '@/lib/project-context';
 import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import { useToast } from '@/ui/use-toast';
 import { PRIORITIES, PRIORITY_ORDER, isOverdue } from '@/lib/kanban-utils';
@@ -13,9 +12,8 @@ import { Loader2, Search, Trash2, CheckCircle2, Flag, Download } from 'lucide-re
 import { exportToCSV } from '@/lib/csv-export';
 
 export default function TaskListView() {
-  const { currentProject } = useProject();
   const { toast } = useToast();
-  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks();
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(new Set());
@@ -23,7 +21,6 @@ export default function TaskListView() {
   const [groupBy, setGroupBy] = useState('priority');
 
   const loadData = useCallback(async () => {
-    if (!currentProject) return;
     setLoading(true);
     try {
       const c = await columnsApi.list();
@@ -32,7 +29,7 @@ export default function TaskListView() {
     } finally {
       setLoading(false);
     }
-  }, [currentProject, tasks]);
+  }, [tasks]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

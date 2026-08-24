@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useProject } from '@/lib/project-context';
 import { ensureBoard, PRIORITIES } from '@/lib/kanban-utils';
 import { useToast } from '@/ui/use-toast';
 import { tasksApi } from '@/lib/api/tasks';
@@ -15,7 +14,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Plus, X, Loader2 } from 'lucide-react';
 
 export default function BoardView() {
-  const { currentProject } = useProject();
   const { toast } = useToast();
   const [board, setBoard] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -25,20 +23,21 @@ export default function BoardView() {
   const [addingColumn, setAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
 
-  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
-  const { columns, loading: columnsLoading } = useRealtimeColumns(board?.id);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks();
+  const { columns, loading: columnsLoading } = useRealtimeColumns();
 
   const loading = tasksLoading || columnsLoading || !board;
 
   const loadData = useCallback(async () => {
-    if (!currentProject) return;
     try {
-      const { board: b } = await ensureBoard(currentProject.id);
+      // For single company, use a fixed board ID or get/create the first board
+      const { board: b } = await ensureBoard('bnbweb-default');
       setBoard(b);
     } catch (error) {
       console.error('Error loading board:', error);
+      toast({ title: 'Erro ao carregar quadro', variant: 'destructive' });
     }
-  }, [currentProject]);
+  }, [toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

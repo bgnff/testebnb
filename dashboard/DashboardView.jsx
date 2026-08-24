@@ -2,21 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tasksApi } from '@/lib/api/tasks';
 import { columnsApi } from '@/lib/api/columns';
-import { useProject } from '@/lib/project-context';
 import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import { PRIORITIES, todayStr, isOverdue } from '@/lib/kanban-utils';
 import { Loader2, CalendarClock, AlertTriangle, CheckCircle2, ListTodo, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 
 export default function DashboardView() {
-  const { currentProject } = useProject();
   const navigate = useNavigate();
-  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks();
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
-    if (!currentProject) return;
     setLoading(true);
     try {
       const cols = await columnsApi.list();
@@ -25,7 +22,7 @@ export default function DashboardView() {
     } finally {
       setLoading(false);
     }
-  }, [currentProject, tasks]);
+  }, [tasks]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -59,7 +56,7 @@ export default function DashboardView() {
       <div className="px-6 py-6 max-w-6xl mx-auto w-full">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold">Painel</h1>
-          <p className="text-sm text-muted-foreground">{currentProject?.name} · visão geral do seu trabalho</p>
+          <p className="text-sm text-muted-foreground">BnBWeb · visão geral do seu trabalho</p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

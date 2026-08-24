@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useProject } from '@/lib/project-context';
 import { useToast } from '@/ui/use-toast';
 import { tasksApi } from '@/lib/api/tasks';
 import { calendarNotesApi } from '@/lib/api/calendar-notes';
@@ -30,12 +29,11 @@ const VIEWS = [
 ];
 
 export default function CalendarView() {
-  const { currentProject } = useProject();
   const { toast } = useToast();
   const [view, setView] = useState('month');
   const [cursor, setCursor] = useState(new Date());
-  const { tasks, loading: tasksLoading } = useRealtimeTasks(currentProject?.id);
-  const { notes, loading: notesLoading } = useRealtimeCalendarNotes(currentProject?.id);
+  const { tasks, loading: tasksLoading } = useRealtimeTasks();
+  const { notes, loading: notesLoading } = useRealtimeCalendarNotes();
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -45,15 +43,13 @@ export default function CalendarView() {
   const [dayNoteColor, setDayNoteColor] = useState('#7c3aed');
 
   const loadData = useCallback(async () => {
-    if (!currentProject) return;
-    setLoading(true);
     try {
-      const clients = await clientsApi.list();
-      setMeetings(clients.filter((c) => c.meeting_date && c.meeting_status === 'scheduled'));
+      const m = await clientsApi.list();
+      setMeetings(m);
     } finally {
       setLoading(false);
     }
-  }, [currentProject]);
+  }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -122,7 +118,7 @@ export default function CalendarView() {
   };
 
   const addNote = async (date, content, color) => {
-    await calendarNotesApi.create({ date, content, color, project_id: currentProject.id });
+    await calendarNotesApi.create({ date, content, color });
     // O hook de realtime vai adicionar automaticamente
   };
 
