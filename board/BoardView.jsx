@@ -114,7 +114,7 @@ export default function BoardView() {
   const addTask = async (columnId, title) => {
     const colTasks = tasks.filter((t) => t.column_id === columnId);
     const created = await tasksApi.create({
-      title, column_id: columnId, board_id: board.id, project_id: currentProject.id, position: colTasks.length,
+      title, column_id: columnId, board_id: board.id, position: colTasks.length,
     });
     // O hook de realtime vai adicionar automaticamente
   };
