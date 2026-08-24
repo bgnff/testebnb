@@ -5,13 +5,11 @@ import { Input } from '@/ui/input';
 import { Button } from '@/ui/button';
 import { Label } from '@/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
-import { useProject } from '@/lib/project-context';
 import { ensureBoard, PRIORITIES, todayStr } from '@/lib/kanban-utils';
 import { useToast } from '@/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
 export default function QuickAddTask({ open, onClose }) {
-  const { currentProject } = useProject();
   const { toast } = useToast();
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState('medium');
@@ -24,14 +22,13 @@ export default function QuickAddTask({ open, onClose }) {
     if (!title.trim()) return;
     setSaving(true);
     try {
-      const { board, columns } = await ensureBoard(currentProject.id);
+      const { board, columns } = await ensureBoard('bnbweb-default');
       const firstCol = columns[0];
-      const colTasks = await tasksApi.list(firstCol.id);
+      const colTasks = await tasksApi.list();
       await tasksApi.create({
         title: title.trim(),
         column_id: firstCol.id,
         board_id: board.id,
-        project_id: currentProject.id,
         position: colTasks.length,
         priority,
         due_date: dueDate || undefined,
