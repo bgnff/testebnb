@@ -33,7 +33,7 @@ export default function NotificationCenter({ className, iconSize = 'w-4 h-4' }) 
   const { currentProject } = useProject();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const { tasks } = useRealtimeTasks(currentProject?.id);
+  const { tasks = [] } = useRealtimeTasks(currentProject?.id);
   const ref = useRef(null);
 
   useEffect(() => {
