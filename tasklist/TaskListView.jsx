@@ -127,7 +127,7 @@ export default function TaskListView() {
         <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Tarefas</h1>
-            <p className="text-sm text-muted-foreground">{tasks.length} tarefas em {currentProject?.name}</p>
+            <p className="text-sm text-muted-foreground">{tasks.length} tarefas em BnBWeb</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative">
