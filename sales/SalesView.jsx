@@ -6,6 +6,7 @@ import { Loader2, Plus, Search, Users, MessageSquareText, Pencil, Trash2, Mail, 
 import { format, parseISO, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useRealtimeClients } from '@/lib/hooks/useRealtimeClients';
+import { clientsApi } from '@/lib/api/clients';
 import ClientForm from '@/sales/ClientForm';
 import ClientDetail from '@/sales/ClientDetail';
 import TemplateManager from '@/sales/TemplateManager';
@@ -26,7 +27,7 @@ export const PLAN_LABELS = {
 };
 
 export default function SalesView() {
-  const { clients, loading, setClients } = useRealtimeClients();
+  const { clients, loading } = useRealtimeClients();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [formOpen, setFormOpen] = useState(false);
@@ -46,12 +47,12 @@ export default function SalesView() {
   const handleSave = async (data) => {
     try {
       if (editing) {
-        const updated = await clientsApi.update(editing.id, data);
-        setClients((p) => p.map((c) => (c.id === updated.id ? updated : c)));
+        await clientsApi.update(editing.id, data);
+        // Hook realtime vai atualizar automaticamente
         toast({ title: 'Cliente atualizado' });
       } else {
-        const created = await clientsApi.create(data);
-        setClients((p) => [created, ...p]);
+        await clientsApi.create(data);
+        // Hook realtime vai atualizar automaticamente
         toast({ title: 'Cliente criado' });
       }
       setFormOpen(false);
@@ -63,13 +64,13 @@ export default function SalesView() {
 
   const handleDelete = async (id) => {
     await clientsApi.delete(id);
-    setClients((p) => p.filter((c) => c.id !== id));
+    // Hook realtime vai atualizar automaticamente
     setDetail(null);
     toast({ title: 'Cliente removido' });
   };
 
   const handleUpdate = (updated) => {
-    setClients((p) => p.map((c) => (c.id === updated.id ? updated : c)));
+    // Hook realtime vai atualizar automaticamente
     setDetail(updated);
   };
 

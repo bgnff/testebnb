@@ -277,8 +277,8 @@ export default function CalendarView() {
           task={selectedTask}
           columns={[]}
           onClose={() => setSelectedTask(null)}
-          onUpdate={(u) => { setTasks((prev) => prev.map((t) => (t.id === u.id ? u : t))); setSelectedTask(u); }}
-          onDelete={async (id) => { await tasksApi.delete(id); setTasks((prev) => prev.filter((t) => t.id !== id)); setSelectedTask(null); }}
+          onUpdate={(u) => { /* Hook realtime vai atualizar automaticamente */ setSelectedTask(u); }}
+          onDelete={async (id) => { await tasksApi.delete(id); /* Hook realtime vai atualizar automaticamente */ setSelectedTask(null); }}
         />
       )}
 
@@ -286,8 +286,8 @@ export default function CalendarView() {
         <ClientDetail
           client={selectedClient}
           onClose={() => setSelectedClient(null)}
-          onUpdate={(u) => { setMeetings((prev) => prev.map((m) => (m.id === u.id ? u : m))); setSelectedClient(u); }}
-          onDelete={async (id) => { setMeetings((prev) => prev.filter((m) => m.id !== id)); setSelectedClient(null); }}
+          onUpdate={(u) => { /* Hook realtime vai atualizar automaticamente */ setSelectedClient(u); }}
+          onDelete={async (id) => { await clientsApi.delete(id); /* Hook realtime vai atualizar automaticamente */ setSelectedClient(null); }}
           onEdit={null}
         />
       )}

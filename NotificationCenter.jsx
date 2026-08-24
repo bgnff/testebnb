@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { tasksApi } from '@/lib/api/tasks';
 import { useProject } from '@/lib/project-context';
+import { useRealtimeTasks } from '@/lib/hooks/useRealtimeTasks';
 import {
   Bell, AlertTriangle, CalendarClock, Clock, ChevronRight,
 } from 'lucide-react';
@@ -33,23 +33,8 @@ export default function NotificationCenter({ className, iconSize = 'w-4 h-4' }) 
   const { currentProject } = useProject();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [tasks, setTasks] = useState([]);
+  const { tasks } = useRealtimeTasks(currentProject?.id);
   const ref = useRef(null);
-
-  const loadTasks = useCallback(async () => {
-    if (!currentProject) return;
-    try {
-      const t = await tasksApi.getByProject(currentProject.id);
-      setTasks(t);
-    } catch { /* ignore */ }
-  }, [currentProject]);
-
-  useEffect(() => { loadTasks(); }, [loadTasks]);
-
-  useEffect(() => {
-    const interval = setInterval(loadTasks, 60000);
-    return () => clearInterval(interval);
-  }, [loadTasks]);
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -78,7 +63,7 @@ export default function NotificationCenter({ className, iconSize = 'w-4 h-4' }) 
   return (
     <div className={cn('relative', className)} ref={ref}>
       <button
-        onClick={() => { setOpen((v) => !v); if (!open) loadTasks(); }}
+        onClick={() => setOpen((v) => !v)}
         className="relative inline-flex items-center justify-center rounded-lg hover:bg-accent transition-colors"
         aria-label="Notificações"
       >
