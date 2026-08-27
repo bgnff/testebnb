@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { tasksApi } from '@/lib/api/tasks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog';
 import { Input } from '@/ui/input';
 import { Textarea } from '@/ui/textarea';
@@ -22,7 +23,14 @@ export default function TaskDetailModal({ task, columns, onClose, onUpdate, onDe
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
 
-  const update = (changes) => onUpdate({ ...task, ...changes });
+  const update = async (changes) => {
+    try {
+      const updated = await tasksApi.update(task.id, changes);
+      onUpdate(updated);
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
 
   const priority = PRIORITIES[task.priority] || PRIORITIES.medium;
 
