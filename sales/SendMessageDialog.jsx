@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { messageTemplatesApi } from '@/lib/api/message-templates';
+import { useRealtimeMessageTemplates } from '@/lib/hooks/useRealtimeMessageTemplates';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/ui/dialog';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
@@ -28,25 +29,10 @@ function fillVariables(text, client) {
 
 export default function SendMessageDialog({ client, mode, onClose }) {
   const { toast } = useToast();
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { templates, loading } = useRealtimeMessageTemplates();
   const [selectedType, setSelectedType] = useState(mode === 'whatsapp' ? 'reuniao' : 'cobranca');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-
-  const loadTemplates = useCallback(async () => {
-    setLoading(true);
-    try {
-      const list = await messageTemplatesApi.list();
-      setTemplates(list);
-    } catch {
-      toast({ title: 'Erro ao carregar modelos', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
   const templatesOfType = templates.filter((t) => t.type === selectedType);
 

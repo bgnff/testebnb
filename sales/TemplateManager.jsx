@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { messageTemplatesApi } from '@/lib/api/message-templates';
+import { useRealtimeMessageTemplates } from '@/lib/hooks/useRealtimeMessageTemplates';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/ui/dialog';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
@@ -27,23 +28,10 @@ const EMPTY = { title: '', type: 'cobranca', subject: '', body: '' };
 
 export default function TemplateManager({ open, onClose }) {
   const { toast } = useToast();
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { templates, loading } = useRealtimeMessageTemplates();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const list = await messageTemplatesApi.list();
-      setTemplates(list);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
 
   const startNew = () => { setForm(EMPTY); setEditing('new'); };
   const startEdit = (t) => { setForm({ title: t.title, type: t.type, subject: t.subject || '', body: t.body }); setEditing(t.id); };
@@ -53,11 +41,9 @@ export default function TemplateManager({ open, onClose }) {
     setSaving(true);
     try {
       if (editing === 'new') {
-        const created = await base44.entities.MessageTemplate.create(form);
-        setTemplates((p) => [created, ...p]);
+        await messageTemplatesApi.create(form);
       } else {
-        const updated = await base44.entities.MessageTemplate.update(editing, form);
-        setTemplates((p) => p.map((t) => (t.id === updated.id ? updated : t)));
+        await messageTemplatesApi.update(editing, form);
       }
       setEditing(null);
       toast({ title: 'Modelo salvo' });
@@ -68,7 +54,6 @@ export default function TemplateManager({ open, onClose }) {
 
   const remove = async (id) => {
     await messageTemplatesApi.delete(id);
-    setTemplates((p) => p.filter((t) => t.id !== id));
     toast({ title: 'Modelo removido' });
   };
 
