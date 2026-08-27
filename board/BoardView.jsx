@@ -23,7 +23,7 @@ export default function BoardView() {
   const [addingColumn, setAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
 
-  const { tasks, loading: tasksLoading } = useRealtimeTasks();
+  const { tasks, loading: tasksLoading, setTasks } = useRealtimeTasks();
   const { columns, loading: columnsLoading } = useRealtimeColumns();
 
   const loading = tasksLoading || columnsLoading || !board;
