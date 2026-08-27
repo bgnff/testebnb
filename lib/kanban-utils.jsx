@@ -31,9 +31,19 @@ export function isToday(dateStr) {
 export async function ensureBoard() {
   let boards = await boardsApi.list();
   let board = boards[0];
+  
+  // Handle race condition: if no board exists, try to create one
   if (!board) {
-    board = await boardsApi.create({ name: 'Quadro Principal' });
+    try {
+      board = await boardsApi.create({ name: 'Quadro Principal' });
+    } catch (error) {
+      // If creation failed (likely due to race condition), fetch boards again
+      boards = await boardsApi.list();
+      board = boards[0];
+      if (!board) throw error; // Re-throw if still no board
+    }
   }
+  
   let columns = await columnsApi.list();
   if (columns.length === 0) {
     const defaults = ['A Fazer', 'Em Andamento', 'Revisão', 'Concluído'];
