@@ -81,33 +81,45 @@ export default function BoardView() {
       }
     }
 
-    const colTasks = {};
-    columns.forEach((c) => { colTasks[c.id] = filteredTasks.filter((t) => t.column_id === c.id).sort((a, b) => (a.position ?? 0) - (b.position ?? 0)); });
-    const [moved] = colTasks[source.droppableId].splice(source.index, 1);
-    if (!moved) return;
-    colTasks[destination.droppableId].splice(destination.index, 0, moved);
+    // Get tasks in the destination column, sorted by position
+    const destTasks = filteredTasks
+      .filter((t) => t.column_id === destination.droppableId)
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 
-    const updates = [];
-    Object.keys(colTasks).forEach((colId) => {
-      colTasks[colId].forEach((t, i) => {
-        if (t.position !== i || t.column_id !== colId) {
-          t.position = i; t.column_id = colId;
-          updates.push({ id: t.id, position: i, column_id: colId });
-        }
+    // Calculate new position using fractional positioning
+    // This allows moving one card without reordering the entire column
+    let newPosition;
+    if (destTasks.length === 0) {
+      newPosition = 0;
+    } else if (destination.index === 0) {
+      // Move to top: position = first task position - 1
+      newPosition = destTasks[0].position - 1;
+    } else if (destination.index >= destTasks.length) {
+      // Move to bottom: position = last task position + 1
+      newPosition = destTasks[destTasks.length - 1].position + 1;
+    } else {
+      // Move between two tasks: position = average of adjacent positions
+      const beforeTask = destTasks[destination.index - 1];
+      const afterTask = destTasks[destination.index];
+      newPosition = (beforeTask.position + afterTask.position) / 2;
+    }
+
+    // Optimistic update
+    setTasks((prev) => prev.map((t) => 
+      t.id === draggableId 
+        ? { ...t, position: newPosition, column_id: destination.droppableId } 
+        : t
+    ));
+
+    // Persist the change (only the moved card, not the whole column)
+    try {
+      await tasksApi.update(draggableId, { 
+        position: newPosition, 
+        column_id: destination.droppableId 
       });
-    });
-
-    setTasks((prev) => prev.map((t) => {
-      const u = updates.find((x) => x.id === t.id);
-      return u ? { ...t, position: u.position, column_id: u.column_id } : t;
-    }));
-
-    if (updates.length) {
-      try {
-        for (const u of updates) {
-          await tasksApi.update(u.id, { position: u.position, column_id: u.column_id });
-        }
-      } catch (e) { toast({ title: 'Falha ao salvar ordem', variant: 'destructive' }); loadData(); }
+    } catch (e) { 
+      toast({ title: 'Falha ao salvar ordem', variant: 'destructive' }); 
+      loadData(); 
     }
   };
 
