@@ -1,6 +1,4 @@
 import { Toaster } from "@/ui/toaster";
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClientInstance } from '@/lib/query-client';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from '@/lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
@@ -23,7 +21,6 @@ function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
           <Router>
             <ScrollToTop />
             <Routes>
@@ -45,7 +42,6 @@ function App() {
             </Routes>
           </Router>
           <Toaster />
-      </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
   )
